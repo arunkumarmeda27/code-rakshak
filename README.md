@@ -42,7 +42,7 @@
 
 ## ⚡ What is Code Rakshak?
 
-**Code Rakshak** *(Hindi: रक्षक = Protector)* is an AI-powered code analysis platform that protects your codebase by:
+**Code Rakshak**  is an AI-powered code analysis platform that protects your codebase by:
 
 - 🔍 **Scanning** your code for security holes, bugs, and quality issues
 - 📊 **Scoring** it on **Strength** (security) and **Fairness** (quality) — both out of 100
