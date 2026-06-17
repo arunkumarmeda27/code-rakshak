@@ -1,0 +1,92 @@
+[
+  {
+    "cveId": "CVE-2021-44228",
+    "name": "Log4Shell",
+    "category": "RCE",
+    "description": "Apache Log4j2 JNDI features used in configuration, log messages, and parameters do not protect against attacker controlled LDAP and other JNDI related endpoints.",
+    "signature": "${jndi:ldap://",
+    "cvss": 10.0,
+    "remediation": "Update Log4j to >= 2.15.0 or set formatMsgNoLookups=true"
+  },
+  {
+    "cveId": "GEN-XSS-01",
+    "name": "DOM-based XSS via innerHTML",
+    "category": "XSS",
+    "description": "Data is read from a user-controllable source and passed to a dangerous sink like innerHTML.",
+    "signature": "innerHTML",
+    "cvss": 7.5,
+    "remediation": "Use textContent instead of innerHTML, or sanitize using DOMPurify."
+  },
+  {
+    "cveId": "GEN-CSRF-01",
+    "name": "Missing SameSite Cookie Attribute",
+    "category": "CSRF",
+    "description": "Session cookies missing the SameSite attribute default to allowing cross-site requests in older browsers, or Lax in newer ones, opening vectors for CSRF.",
+    "signature": "Missing SameSite",
+    "cvss": 6.5,
+    "remediation": "Set SameSite=Strict or SameSite=Lax on all session cookies."
+  },
+  {
+    "cveId": "GEN-AUTH-01",
+    "name": "JWT None Algorithm",
+    "category": "Authentication Bypass",
+    "description": "The server accepts JWTs signed with the 'none' algorithm, allowing attackers to forge tokens.",
+    "signature": "\"alg\": \"none\"",
+    "cvss": 9.8,
+    "remediation": "Enforce strict algorithm checking and reject 'none' algorithm in JWT parsing libraries."
+  },
+  {
+    "cveId": "GEN-MISC-01",
+    "name": "Unauthenticated Actuator Endpoints",
+    "category": "Information Disclosure",
+    "description": "Spring Boot actuator endpoints (/actuator/env, /actuator/heapdump) are exposed without authentication.",
+    "signature": "/actuator/env",
+    "cvss": 7.5,
+    "remediation": "Disable sensitive actuator endpoints or protect them with Spring Security."
+  },
+  {
+    "cveId": "CVE-2014-0160",
+    "name": "Heartbleed",
+    "category": "Information Disclosure",
+    "description": "The (1) TLS and (2) DTLS implementations in OpenSSL do not properly handle Heartbeat Extension packets.",
+    "signature": "TLS heartbeat",
+    "cvss": 7.5,
+    "remediation": "Update OpenSSL to patched versions."
+  },
+  {
+    "cveId": "GEN-XSS-02",
+    "name": "Reflected XSS in URL Parameters",
+    "category": "XSS",
+    "description": "User input from the URL query string is reflected directly into the HTML response without sanitization.",
+    "signature": "query string reflection",
+    "cvss": 6.1,
+    "remediation": "Context-aware HTML encoding of all user-supplied data before reflection."
+  },
+  {
+    "cveId": "GEN-IDOR-01",
+    "name": "Insecure Direct Object Reference",
+    "category": "IDOR",
+    "description": "API endpoints accessing resources via predictable IDs (/api/users/123) without checking if the current user owns the resource.",
+    "signature": "/api/users/{id}",
+    "cvss": 6.5,
+    "remediation": "Implement strict authorization checks verifying ownership at the controller level."
+  },
+  {
+    "cveId": "GEN-API-01",
+    "name": "API Key Exposure in Client Source",
+    "category": "Information Disclosure",
+    "description": "Sensitive API keys (AWS, Stripe, etc.) are hardcoded in client-side JavaScript.",
+    "signature": "api_key=",
+    "cvss": 8.5,
+    "remediation": "Move secrets to backend environment variables and proxy API calls."
+  },
+  {
+    "cveId": "GEN-HEADER-01",
+    "name": "Missing Strict-Transport-Security",
+    "category": "Misconfiguration",
+    "description": "Site lacks HSTS header, allowing active network attackers to downgrade connections to plaintext HTTP.",
+    "signature": "Strict-Transport-Security: missing",
+    "cvss": 5.9,
+    "remediation": "Add Strict-Transport-Security header with max-age >= 31536000."
+  }
+]
