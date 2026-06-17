@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// WATERMARK: Copyright (c) 2026 Code Rakshak by arunkumarmeda27.
+// Protected under MIT License. All copies must contain this watermark.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import { useState, useRef, useCallback, useEffect } from 'react';
 import './index.css';
 
@@ -288,6 +293,55 @@ export default function App() {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mousedown', onMouseDown);
       window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleCopy = (e) => {
+      const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
+      
+      const selectedText = selection.toString();
+      if (!selectedText.trim()) return;
+
+      const range = selection.getRangeAt(0);
+      const container = range.commonAncestorContainer;
+      const element = container.nodeType === 1 ? container : container.parentElement;
+      
+      if (element && document.body.contains(element)) {
+        e.preventDefault();
+        
+        const lines = selectedText.split('\n');
+        const watermarkedLines = [];
+        const watermarkMsg = "Protected by Code Rakshak (github.com/arunkumarmeda27/code-rakshak)";
+        
+        lines.forEach((line, idx) => {
+          watermarkedLines.push(line);
+          
+          if ((idx + 1) % 5 === 0 && idx < lines.length - 1) {
+            let commentChar = "//";
+            if (line.includes('def ') || line.includes('import ') || line.trim().startsWith('#')) {
+              commentChar = "#";
+            }
+            const indent = line.match(/^\s*/)[0];
+            watermarkedLines.push(`${indent}${commentChar} [WATERMARK] ${watermarkMsg}`);
+          }
+        });
+        
+        const header = `/* [WATERMARK] Origin: Code Rakshak by arunkumarmeda27 */\n`;
+        const finalCopiedText = header + watermarkedLines.join('\n');
+        
+        if (e.clipboardData) {
+          e.clipboardData.setData('text/plain', finalCopiedText);
+        } else if (window.clipboardData) {
+          window.clipboardData.setData('Text', finalCopiedText);
+        }
+      }
+    };
+
+    document.addEventListener('copy', handleCopy);
+    return () => {
+      document.removeEventListener('copy', handleCopy);
     };
   }, []);
 

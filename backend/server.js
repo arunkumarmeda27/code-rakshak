@@ -1,3 +1,8 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// WATERMARK: Copyright (c) 2026 Code Rakshak by arunkumarmeda27.
+// Protected under MIT License. All copies must contain this watermark.
+// ═══════════════════════════════════════════════════════════════════════════
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
