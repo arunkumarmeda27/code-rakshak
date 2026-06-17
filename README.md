@@ -83,6 +83,25 @@ Unlike traditional linters, Code Rakshak explains **what the problem is**, **why
 
 ---
 
+## 🎥 Media & Advertising Campaign
+
+Check out the media assets created for Code Rakshak:
+
+### 🎞️ Cyber Video Advertisement
+We have generated a high-tech video advertisement detailing the features and workflow of Code Rakshak. It includes custom particle animations, code rain, and interactive rating visualizers:
+- **Watch the Video**: [code_rakshak_ad.mp4](code_rakshak_ad.mp4) (Download or view directly in GitHub)
+- **Interactive Web Ad**: Open [CODE_RAKSHAK_AD.html](CODE_RAKSHAK_AD.html) in any browser to experience the real-time HTML5/JS animated version!
+- **Video Generator Script**: Check out [generate_video.py](generate_video.py) to see how the video frames were programmatically rendered with Pillow and compiled using OpenCV.
+
+### 🖼️ Campaign Posters (Cyber Theme)
+A collection of professional marketing posters ready to publish on social media:
+* **Landscape Poster**: [CODE_RAKSHAK_POSTER.png](CODE_RAKSHAK_POSTER.png)
+* **Epic Cyber Theme**: [CODE_RAKSHAK_POSTER_EPIC.png](CODE_RAKSHAK_POSTER_EPIC.png)
+* **Square Format (Instagram/LinkedIn/X)**: [CODE_RAKSHAK_POSTER_SQUARE.png](CODE_RAKSHAK_POSTER_SQUARE.png)
+* **Story Format (Vertical/Tiktok)**: [CODE_RAKSHAK_POSTER_STORY.png](CODE_RAKSHAK_POSTER_STORY.png)
+
+---
+
 ## 🧠 How It Works
 
 Code Rakshak runs **4 specialized Gemini AI agents** in sequence:
