@@ -32,10 +32,10 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json({ limit: '12mb' })); // 12MB body limit for large multi-file uploads
+app.use(express.json({ limit: '25mb' })); // 25MB body limit to handle large React projects
 
-// Max combined code size — 5MB
-const MAX_CODE_SIZE = 5 * 1024 * 1024;
+// Max combined code size — 20MB
+const MAX_CODE_SIZE = 20 * 1024 * 1024;
 const activeAnalyses = new Map();
 // { analysisId: { status: 'running'|'done'|'error', pdfBuffer: null, clients: Set<response>, resultContent: string, scores: {} } }
 

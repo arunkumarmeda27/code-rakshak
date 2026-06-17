@@ -29,13 +29,33 @@ const ANALYSIS_PHASES = [
 
 // Allowed source-code extensions
 const CODE_EXTENSIONS = new Set([
-  '.py','.js','.jsx','.ts','.tsx','.java','.cpp','.cc','.cxx',
-  '.c','.h','.hpp','.go','.rs','.php','.rb','.cs','.swift',
-  '.kt','.scala','.sh','.bash','.sql','.html','.css','.xml',
-  '.json','.yaml','.yml','.toml','.cfg','.ini','.env','.md','.txt'
+  '.py','.js','.jsx','.ts','.tsx','.mjs','.cjs',
+  '.java','.cpp','.cc','.cxx','.c','.h','.hpp',
+  '.go','.rs','.php','.rb','.cs','.swift','.kt','.scala',
+  '.sh','.bash','.zsh','.sql','.html','.css','.scss','.sass',
+  '.less','.vue','.svelte','.xml','.yaml','.yml','.toml',
+  '.cfg','.ini','.env','.md','.graphql','.prisma',
 ]);
 
-const MAX_TOTAL_KB = 5 * 1024; // 5 MB combined
+// Files/folders to always skip (noise, not real code)
+const SKIP_PATTERNS = [
+  'node_modules', 'dist', 'build', '.next', 'out', 'coverage',
+  '.git', '.cache', '__pycache__', '.venv', 'venv', 'vendor',
+  'package-lock.json', 'yarn.lock', 'pnpm-lock.yaml',
+  'bun.lockb', '.DS_Store', 'Thumbs.db',
+];
+
+// Priority files analyzed first (most important code)
+const PRIORITY_PATTERNS = [
+  /\.(jsx?|tsx?)$/, // JS/TS source first
+  /\.py$/,          // Python
+  /\.java$/,        // Java
+  /\.go$/,          // Go
+  /\.rs$/,          // Rust
+];
+
+const MAX_FILE_BYTES  = 5  * 1024 * 1024; // 5 MB per individual file
+const MAX_TOTAL_BYTES = 20 * 1024 * 1024; // 20 MB combined total
 
 const SAMPLE_CODE = `# Sample Python code — paste yours or upload files!
 import sqlite3
@@ -234,49 +254,93 @@ export default function App() {
     setPhases(prev => ({ ...prev, [phase]: status }));
   }, []);
 
-  // ── Multi-file handler ─────────────────────────────────────────────────
+  // ── Smart multi-file handler ──────────────────────────────────────────
   const handleFiles = useCallback((fileList) => {
+    // Step 1: Filter — keep only real source code, skip noise
     const files = Array.from(fileList).filter(f => {
-      const ext = f.name.substring(f.name.lastIndexOf('.')).toLowerCase();
-      return CODE_EXTENSIONS.has(ext) && f.size < 2 * 1024 * 1024; // skip files >2MB each
+      const name = f.name.toLowerCase();
+      const path = (f.webkitRelativePath || f.name).toLowerCase();
+
+      // Skip lock files, build output, hidden dirs, node_modules etc.
+      const shouldSkip = SKIP_PATTERNS.some(p => path.includes(p.toLowerCase()));
+      if (shouldSkip) return false;
+
+      // Skip files that are too large individually
+      if (f.size > MAX_FILE_BYTES) return false;
+
+      // Must have a recognized code extension
+      const ext = name.substring(name.lastIndexOf('.'));
+      return CODE_EXTENSIONS.has(ext);
     });
 
     if (files.length === 0) {
-      alert('No supported code files found. Supported: .py, .js, .ts, .java, .cpp, .go, .rs, .php, .rb, .cs and more.');
+      alert('No supported source code files found.\n\nNote: node_modules, dist, build, and lock files are automatically skipped.');
       return;
     }
 
-    // Read all files and combine
-    const readers = files.map(file => new Promise((resolve) => {
+    // Step 2: Sort — priority source files first, then everything else
+    const sorted = [...files].sort((a, b) => {
+      const aScore = PRIORITY_PATTERNS.findIndex(p => p.test(a.name)) + 1 || 99;
+      const bScore = PRIORITY_PATTERNS.findIndex(p => p.test(b.name)) + 1 || 99;
+      return aScore - bScore;
+    });
+
+    // Step 3: Read all files
+    const readers = sorted.map(file => new Promise(resolve => {
       const reader = new FileReader();
-      reader.onload = (e) => resolve({ name: file.name, size: file.size, content: e.target.result });
+      reader.onload = e => resolve({
+        name: file.name,
+        path: file.webkitRelativePath || file.name,
+        size: file.size,
+        content: e.target.result || ''
+      });
+      reader.onerror = () => resolve({ name: file.name, path: file.name, size: 0, content: '' });
       reader.readAsText(file);
     }));
 
     Promise.all(readers).then(results => {
-      // Check combined size
-      const totalBytes = results.reduce((sum, r) => sum + r.size, 0);
-      if (totalBytes > MAX_TOTAL_KB * 1024) {
-        alert(`Total file size exceeds ${MAX_TOTAL_KB / 1024}MB. Please select fewer files.`);
+      // Step 4: If total is over 20MB, keep adding files until limit hit (priority order)
+      let totalBytes = 0;
+      const kept = [];
+      const skipped = [];
+      for (const r of results) {
+        if (totalBytes + r.size > MAX_TOTAL_BYTES) {
+          skipped.push(r.name);
+        } else {
+          kept.push(r);
+          totalBytes += r.size;
+        }
+      }
+
+      if (kept.length === 0) {
+        alert('All files are too large to analyze. Please upload fewer or smaller files.');
         return;
       }
 
-      // Combine all files with clear separators
+      // Step 5: Combine with clear file separators
       let combined = '';
-      for (const r of results) {
+      if (skipped.length > 0) {
+        combined += `// ⚠️ Note: ${skipped.length} file(s) were skipped due to size limit:\n`;
+        combined += `// ${skipped.slice(0, 5).join(', ')}${skipped.length > 5 ? ` +${skipped.length - 5} more` : ''}\n\n`;
+      }
+      for (const r of kept) {
         combined += `\n${'='.repeat(60)}\n`;
-        combined += `FILE: ${r.name}\n`;
+        combined += `FILE: ${r.path}\n`;
         combined += `${'='.repeat(60)}\n`;
         combined += r.content + '\n';
       }
 
-      const displayName = results.length === 1
-        ? results[0].name
-        : `${results.length} files (${results[0].name}…)`;
+      const displayName = kept.length === 1
+        ? kept[0].name
+        : `${kept.length} files (${kept[0].name}…)`;
 
       setCode(combined.trim());
       setFilename(displayName);
-      setLoadedFiles(results.map(r => ({ name: r.name, size: r.size })));
+      setLoadedFiles(kept.map(r => ({ name: r.name, size: r.size })));
+
+      if (skipped.length > 0) {
+        console.info(`Skipped ${skipped.length} files due to total size limit:`, skipped);
+      }
     });
   }, []);
 

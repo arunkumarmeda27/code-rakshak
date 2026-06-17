@@ -3,13 +3,22 @@
  * Finds vulnerabilities: SQL injection, XSS, hardcoded secrets, OWASP Top 10 issues.
  */
 
-// Smart code truncation: send up to 60K chars; if larger, send first 40K + last 20K
+// Smart code sampling: up to 120K chars.
+// For very large files, samples from beginning, middle, AND end to get full coverage.
 function prepareCodeForAI(code) {
-    const MAX = 60000;
+    const MAX = 120000;
     if (code.length <= MAX) return code;
-    const head = code.substring(0, 40000);
-    const tail = code.substring(code.length - 20000);
-    return head + '\n\n... [middle section omitted — security scan covers start and end] ...\n\n' + tail;
+    const head   = code.substring(0, 60000);
+    const midPos = Math.floor(code.length / 2);
+    const middle = code.substring(midPos - 15000, midPos + 15000);
+    const tail   = code.substring(code.length - 30000);
+    return (
+        head +
+        '\n\n// ... [SECTION SKIPPED — middle portion sampled below] ...\n\n' +
+        middle +
+        '\n\n// ... [SECTION SKIPPED — end of file below] ...\n\n' +
+        tail
+    );
 }
 
 import { GoogleGenAI } from '@google/genai';
