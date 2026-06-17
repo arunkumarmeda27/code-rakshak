@@ -3,6 +3,15 @@
  * Finds vulnerabilities: SQL injection, XSS, hardcoded secrets, OWASP Top 10 issues.
  */
 
+// Smart code truncation: send up to 60K chars; if larger, send first 40K + last 20K
+function prepareCodeForAI(code) {
+    const MAX = 60000;
+    if (code.length <= MAX) return code;
+    const head = code.substring(0, 40000);
+    const tail = code.substring(code.length - 20000);
+    return head + '\n\n... [middle section omitted — security scan covers start and end] ...\n\n' + tail;
+}
+
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -43,7 +52,7 @@ PRE-SCREENED FLAGS: ${parsedCode.redFlags.map(f => `${f.name} [${f.severity}]`).
 
 CODE:
 \`\`\`${parsedCode.detectedLanguage}
-${parsedCode.code.substring(0, 8000)}
+${prepareCodeForAI(parsedCode.code)}
 \`\`\`
 
 Find ALL security vulnerabilities. For each finding:

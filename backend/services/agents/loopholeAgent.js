@@ -3,6 +3,15 @@
  * Finds logical bugs, edge cases, race conditions, and hidden vulnerabilities.
  */
 
+// Smart code truncation: send up to 60K chars; if larger, send first 40K + last 20K
+function prepareCodeForAI(code) {
+    const MAX = 60000;
+    if (code.length <= MAX) return code;
+    const head = code.substring(0, 40000);
+    const tail = code.substring(code.length - 20000);
+    return head + '\n\n... [middle section omitted — loophole scan covers start and end] ...\n\n' + tail;
+}
+
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -44,7 +53,7 @@ Functions: ${parsedCode.metrics.functionCount}
 
 CODE:
 \`\`\`${parsedCode.detectedLanguage}
-${parsedCode.code.substring(0, 8000)}
+${prepareCodeForAI(parsedCode.code)}
 \`\`\`
 
 Think adversarially. Find:

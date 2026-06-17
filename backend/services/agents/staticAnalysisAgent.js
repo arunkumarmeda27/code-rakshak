@@ -1,7 +1,11 @@
-/**
- * Code Rakshak — Static Analysis Agent
- * Analyzes code structure, complexity, anti-patterns, dead code, and architecture.
- */
+// Smart code truncation: send up to 60K chars (~1500 lines); if larger, send first 40K + last 20K
+function prepareCodeForAI(code) {
+    const MAX = 60000;
+    if (code.length <= MAX) return code;
+    const head = code.substring(0, 40000);
+    const tail = code.substring(code.length - 20000);
+    return head + '\n\n... [middle section omitted for length — focusing on start and end of file] ...\n\n' + tail;
+}
 
 import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
@@ -42,7 +46,7 @@ METRICS:
 
 CODE:
 \`\`\`${parsedCode.detectedLanguage}
-${parsedCode.code.substring(0, 8000)}
+${prepareCodeForAI(parsedCode.code)}
 \`\`\`
 
 Analyze for: structure, complexity, anti-patterns, dead code, naming, coupling.

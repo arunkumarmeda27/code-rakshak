@@ -35,7 +35,7 @@ const CODE_EXTENSIONS = new Set([
   '.json','.yaml','.yml','.toml','.cfg','.ini','.env','.md','.txt'
 ]);
 
-const MAX_TOTAL_KB = 400; // 400 KB combined
+const MAX_TOTAL_KB = 5 * 1024; // 5 MB combined
 
 const SAMPLE_CODE = `# Sample Python code — paste yours or upload files!
 import sqlite3
@@ -238,7 +238,7 @@ export default function App() {
   const handleFiles = useCallback((fileList) => {
     const files = Array.from(fileList).filter(f => {
       const ext = f.name.substring(f.name.lastIndexOf('.')).toLowerCase();
-      return CODE_EXTENSIONS.has(ext) && f.size < 200 * 1024; // skip >200KB individual files
+      return CODE_EXTENSIONS.has(ext) && f.size < 2 * 1024 * 1024; // skip files >2MB each
     });
 
     if (files.length === 0) {
@@ -257,7 +257,7 @@ export default function App() {
       // Check combined size
       const totalBytes = results.reduce((sum, r) => sum + r.size, 0);
       if (totalBytes > MAX_TOTAL_KB * 1024) {
-        alert(`Total file size exceeds ${MAX_TOTAL_KB}KB. Please select fewer files.`);
+        alert(`Total file size exceeds ${MAX_TOTAL_KB / 1024}MB. Please select fewer files.`);
         return;
       }
 
@@ -537,10 +537,10 @@ export default function App() {
 
           {/* Upload hint */}
           <div className="upload-hint">
-            <span>📄 <strong>File</strong> — single file</span>
-            <span>📂 <strong>Files</strong> — select multiple files at once</span>
-            <span>🗂️ <strong>Folder</strong> — upload your entire project folder</span>
-            <span>🖱️ Or <strong>drag & drop</strong> files anywhere above</span>
+            <span>📄 <strong>File</strong> — one file up to 2MB</span>
+            <span>📂 <strong>Files</strong> — pick multiple at once</span>
+            <span>🗂️ <strong>Folder</strong> — your whole project folder</span>
+            <span>🖱️ Or <strong>drag & drop</strong> anything here</span>
           </div>
         </section>
       )}

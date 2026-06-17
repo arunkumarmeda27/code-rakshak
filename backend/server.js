@@ -32,10 +32,10 @@ app.use(cors({
     credentials: true
 }));
 
-app.use(express.json({ limit: '600kb' })); // 600KB to handle multi-file uploads
+app.use(express.json({ limit: '12mb' })); // 12MB body limit for large multi-file uploads
 
-// Max combined code size — 400KB
-const MAX_CODE_SIZE = 400 * 1024;
+// Max combined code size — 5MB
+const MAX_CODE_SIZE = 5 * 1024 * 1024;
 const activeAnalyses = new Map();
 // { analysisId: { status: 'running'|'done'|'error', pdfBuffer: null, clients: Set<response>, resultContent: string, scores: {} } }
 
@@ -54,7 +54,7 @@ function validateCodeInput(code, language) {
         return 'Code cannot be empty';
     }
     if (Buffer.byteLength(code, 'utf8') > MAX_CODE_SIZE) {
-        return `Code exceeds maximum size of ${MAX_CODE_SIZE / 1024}KB`;
+        return `Code exceeds maximum size of ${Math.round(MAX_CODE_SIZE / 1024 / 1024)}MB`;
     }
     if (language && !SUPPORTED_LANGUAGES.includes(language.toLowerCase())) {
         return `Unsupported language. Supported: ${SUPPORTED_LANGUAGES.join(', ')}`;
