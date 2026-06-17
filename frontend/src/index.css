@@ -1416,3 +1416,131 @@ body {
   font-weight: 600;
   text-transform: uppercase;
 }
+
+/* ── Custom Futuristic Cursor ────────────────────────────────────────────── */
+.custom-cursor,
+.custom-cursor-ring {
+  display: none;
+}
+
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+  a, button, select, textarea, input, [role="button"], option {
+    cursor: none !important;
+  }
+
+  .custom-cursor {
+    display: block;
+    width: 6px;
+    height: 6px;
+    background-color: var(--amber);
+    border-radius: 50%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 99999;
+    margin-left: -3px;
+    margin-top: -3px;
+    transition: width 0.2s, height 0.2s, background-color 0.2s;
+    box-shadow: 0 0 10px var(--amber);
+    will-change: transform;
+  }
+
+  .custom-cursor-ring {
+    display: block;
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid var(--blue-light);
+    border-radius: 50%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 99998;
+    margin-left: -16px;
+    margin-top: -16px;
+    transition: transform 0.08s cubic-bezier(0.25, 1, 0.5, 1), 
+                width 0.2s, 
+                height 0.2s, 
+                border-color 0.2s, 
+                background-color 0.2s, 
+                margin 0.2s;
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+    will-change: transform;
+  }
+
+  /* Hover states */
+  .custom-cursor.hovered {
+    width: 8px;
+    height: 8px;
+    margin-left: -4px;
+    margin-top: -4px;
+    background-color: var(--white);
+    box-shadow: 0 0 12px var(--white);
+  }
+
+  .custom-cursor-ring.hovered {
+    width: 48px;
+    height: 48px;
+    margin-left: -24px;
+    margin-top: -24px;
+    border-color: var(--amber);
+    background-color: rgba(245, 166, 35, 0.08);
+    box-shadow: 0 0 25px rgba(245, 166, 35, 0.4);
+  }
+
+  /* Target Crosshair Notches on Hover */
+  .custom-cursor-ring.hovered::before,
+  .custom-cursor-ring.hovered::after {
+    content: '';
+    position: absolute;
+    background-color: var(--amber);
+    transition: opacity 0.2s;
+    pointer-events: none;
+  }
+
+  /* Vertical notches */
+  .custom-cursor-ring.hovered::before {
+    top: -6px;
+    bottom: -6px;
+    left: 50%;
+    width: 1px;
+    transform: translateX(-50%);
+    background: linear-gradient(
+      to bottom, 
+      var(--amber) 4px, 
+      transparent 4px, 
+      transparent calc(100% - 4px), 
+      var(--amber) calc(100% - 4px)
+    );
+  }
+
+  /* Horizontal notches */
+  .custom-cursor-ring.hovered::after {
+    left: -6px;
+    right: -6px;
+    top: 50%;
+    height: 1px;
+    transform: translateY(-50%);
+    background: linear-gradient(
+      to right, 
+      var(--amber) 4px, 
+      transparent 4px, 
+      transparent calc(100% - 4px), 
+      var(--amber) calc(100% - 4px)
+    );
+  }
+
+  /* Click effect */
+  .custom-cursor-ring.clicked {
+    width: 24px;
+    height: 24px;
+    margin-left: -12px;
+    margin-top: -12px;
+    border-color: var(--critical);
+    box-shadow: 0 0 20px var(--critical);
+  }
+}

@@ -238,6 +238,9 @@ export default function App() {
   const multiFileRef = useRef(null);
   const logsEndRef = useRef(null);
   const eventSourceRef = useRef(null);
+  
+  const cursorDotRef = useRef(null);
+  const cursorRingRef = useRef(null);
 
   const lineCount = code.split('\n').length;
   const charCount = code.length;
@@ -245,6 +248,48 @@ export default function App() {
   useEffect(() => {
     logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [logs]);
+
+  useEffect(() => {
+    const dot = cursorDotRef.current;
+    const ring = cursorRingRef.current;
+    if (!dot || !ring) return;
+
+    const onMouseMove = (e) => {
+      const { clientX: x, clientY: y } = e;
+      dot.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      ring.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+      const target = e.target;
+      if (!target) return;
+      
+      const isInteractive = target.closest('a, button, select, textarea, input, [role="button"]') || target.classList.contains('interactive');
+      if (isInteractive) {
+        dot.classList.add('hovered');
+        ring.classList.add('hovered');
+      } else {
+        dot.classList.remove('hovered');
+        ring.classList.remove('hovered');
+      }
+    };
+
+    const onMouseDown = () => {
+      ring.classList.add('clicked');
+    };
+
+    const onMouseUp = () => {
+      ring.classList.remove('clicked');
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mousedown', onMouseDown);
+    window.addEventListener('mouseup', onMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mousedown', onMouseDown);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, []);
 
   const addLog = useCallback((phase, message) => {
     setLogs(prev => [...prev.slice(-49), { phase, message }]);
@@ -459,6 +504,8 @@ export default function App() {
 
   return (
     <div className="app">
+      <div ref={cursorDotRef} className="custom-cursor" />
+      <div ref={cursorRingRef} className="custom-cursor-ring" />
       {/* ── Navbar ── */}
       <nav className="navbar">
         <div className="navbar-inner">
