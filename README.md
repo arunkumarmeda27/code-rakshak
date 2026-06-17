@@ -20,7 +20,7 @@
 ![Gemini](https://img.shields.io/badge/Powered_by-Gemini_AI-4285F4?style=flat-square&logo=google)
 ![Status](https://img.shields.io/badge/status-active-success?style=flat-square)
 
-### *"रक्षक"* — The Protector. AI-powered code analysis that speaks plain English.
+### AI-powered code analysis that speaks plain English.
 
 [🚀 Live Demo](#-quick-start) · [📖 Documentation](#-how-it-works) · [🐛 Report Bug](https://github.com/arunkumarmeda27/code-rakshak/issues) · [✨ Request Feature](https://github.com/arunkumarmeda27/code-rakshak/issues)
 
@@ -42,7 +42,7 @@
 
 ## ⚡ What is Code Rakshak?
 
-**Code Rakshak** *(Hindi: रक्षक = Protector)* is an AI-powered code analysis platform that protects your codebase by:
+**Code Rakshak** is an AI-powered code analysis platform that protects your codebase by:
 
 - 🔍 **Scanning** your code for security holes, bugs, and quality issues
 - 📊 **Scoring** it on **Strength** (security) and **Fairness** (quality) — both out of 100
@@ -80,25 +80,6 @@ Unlike traditional linters, Code Rakshak explains **what the problem is**, **why
 │  🔴 3 Critical  🟠 2 High  🟡 1 Medium  🟢 4 Low            │
 └──────────────────────────────────────────────────────────────┘
 ```
-
----
-
-## 🎥 Media & Advertising Campaign
-
-Check out the media assets created for Code Rakshak:
-
-### 🎞️ Cyber Video Advertisement
-We have generated a high-tech video advertisement detailing the features and workflow of Code Rakshak. It includes custom particle animations, code rain, and interactive rating visualizers:
-- **Watch the Video**: [code_rakshak_ad.mp4](code_rakshak_ad.mp4) (Download or view directly in GitHub)
-- **Interactive Web Ad**: Open [CODE_RAKSHAK_AD.html](CODE_RAKSHAK_AD.html) in any browser to experience the real-time HTML5/JS animated version!
-- **Video Generator Script**: Check out [generate_video.py](generate_video.py) to see how the video frames were programmatically rendered with Pillow and compiled using OpenCV.
-
-### 🖼️ Campaign Posters (Cyber Theme)
-A collection of professional marketing posters ready to publish on social media:
-* **Landscape Poster**: [CODE_RAKSHAK_POSTER.png](CODE_RAKSHAK_POSTER.png)
-* **Epic Cyber Theme**: [CODE_RAKSHAK_POSTER_EPIC.png](CODE_RAKSHAK_POSTER_EPIC.png)
-* **Square Format (Instagram/LinkedIn/X)**: [CODE_RAKSHAK_POSTER_SQUARE.png](CODE_RAKSHAK_POSTER_SQUARE.png)
-* **Story Format (Vertical/Tiktok)**: [CODE_RAKSHAK_POSTER_STORY.png](CODE_RAKSHAK_POSTER_STORY.png)
 
 ---
 
@@ -395,7 +376,7 @@ git push origin feature/your-feature-name
 - 🧪 Add unit tests for the analysis agents
 - 🔌 Add VS Code extension integration
 - 📈 Add historical analysis tracking
-- 🌍 Add multi-language report output (Hindi, Spanish, etc.)
+- 🌍 Add multi-language report output (Spanish, French, etc.)
 
 ---
 

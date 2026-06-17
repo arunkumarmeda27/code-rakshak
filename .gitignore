@@ -44,3 +44,12 @@ test-results/
 # ── Misc ──────────────────────────────────────────────────
 .claude/
 *.bak
+
+# ── Local Ad & Media Files (do not commit to git) ──────────
+CODE_RAKSHAK_AD.html
+CODE_RAKSHAK_POSTER.png
+CODE_RAKSHAK_POSTER_EPIC.png
+CODE_RAKSHAK_POSTER_SQUARE.png
+CODE_RAKSHAK_POSTER_STORY.png
+code_rakshak_ad.mp4
+generate_video.py
