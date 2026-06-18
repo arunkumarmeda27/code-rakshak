@@ -44,8 +44,6 @@ const MAX_CODE_SIZE = 20 * 1024 * 1024;
 const activeAnalyses = new Map();
 // { analysisId: { status: 'running'|'done'|'error', pdfBuffer: null, clients: Set<response>, resultContent: string, scores: {} } }
 
-const MAX_CODE_SIZE = 50 * 1024; // 50KB
-
 const SUPPORTED_LANGUAGES = [
     'javascript', 'typescript', 'python', 'java', 'cpp', 'c',
     'go', 'rust', 'php', 'ruby', 'csharp', 'swift', 'kotlin', 'auto'
