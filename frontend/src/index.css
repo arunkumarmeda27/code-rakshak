@@ -1544,3 +1544,283 @@ body {
     box-shadow: 0 0 20px var(--critical);
   }
 }
+
+/* ── GitHub Repository Form ── */
+.github-form-container {
+  padding: 40px;
+  background: var(--surface);
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.github-form-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+
+.github-icon {
+  font-size: 36px;
+  color: var(--amber);
+}
+
+.github-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--white);
+}
+
+.github-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.github-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group label .required {
+  color: var(--critical);
+}
+
+.form-group label .optional {
+  color: var(--text-muted);
+  text-transform: lowercase;
+  font-weight: 400;
+}
+
+.form-group input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--white);
+  padding: 12px 16px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+  font-family: var(--font-sans);
+}
+
+.form-group input:focus {
+  border-color: var(--amber);
+  box-shadow: 0 0 10px rgba(245, 166, 35, 0.15);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.github-form-error {
+  padding: 12px 16px;
+  background: var(--critical-bg);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: var(--critical);
+  font-size: 13px;
+}
+
+.github-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.btn-github-cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-github-cancel:hover {
+  background: var(--surface-2);
+  color: var(--white);
+}
+
+.btn-github-submit {
+  background: linear-gradient(135deg, var(--amber), var(--gold));
+  border: none;
+  border-radius: 8px;
+  color: var(--navy);
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-github-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(245, 166, 35, 0.3);
+}
+
+.btn-github-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-upload-github.active {
+  background: var(--amber) !important;
+  border-color: var(--amber-light) !important;
+  color: var(--navy) !important;
+  font-weight: 600;
+}
+
+/* ── Secrets Leaks Tab & Cards ── */
+.secrets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.secret-item {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  border-left: 4px solid var(--critical);
+  box-shadow: var(--shadow);
+  transition: transform 0.2s;
+}
+
+.secret-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.secret-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.secret-badge {
+  background: var(--critical-bg);
+  color: var(--critical);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.secret-location {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.secret-location span {
+  font-family: var(--font-mono);
+  color: var(--white);
+  background: rgba(255,255,255,0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.secret-location strong {
+  color: var(--amber);
+}
+
+.secret-snippet-wrap {
+  margin-bottom: 16px;
+}
+
+.secret-snippet-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.secret-snippet {
+  background: var(--navy);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 6px;
+  padding: 12px 16px;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.secret-snippet code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: #F3F4F6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.secret-remediation {
+  background: rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  border-radius: 8px;
+  color: var(--info);
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Highlight secrets tab when issues found */
+.report-tab.highlight-secrets {
+  position: relative;
+}
+
+.report-tab.highlight-secrets::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: var(--critical);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--critical);
+  animation: pulse-glow 1.5s infinite;
+}
+

@@ -11,6 +11,7 @@ import { parseCode } from './services/codeParser.js';
 import { analyzeCode } from './services/codeAnalyzer.js';
 import { applyConstitutionalFilter } from './services/constitutionalFilter.js';
 import { generatePDF } from './services/pdfGenerator.js';
+import { fetchGithubRepo } from './services/githubService.js';
 
 dotenv.config();
 
@@ -78,6 +79,21 @@ app.get('/health', (req, res) => {
 // ── Get Supported Languages ──────────────────────────────────────────────
 app.get('/api/languages', (req, res) => {
     res.json({ languages: SUPPORTED_LANGUAGES });
+});
+
+// ── GitHub Fetch Endpoint ──────────────────────────────────────────────
+app.post('/api/github/fetch', async (req, res) => {
+    const { repoUrl, branch = '', token = '' } = req.body;
+    if (!repoUrl) {
+        return res.status(400).json({ error: 'Repository URL is required' });
+    }
+    try {
+        const result = await fetchGithubRepo(repoUrl, branch, token);
+        res.json(result);
+    } catch (error) {
+        console.error(`[GitHub Fetch Error]`, error);
+        res.status(500).json({ error: error.message });
+    }
 });
 
 // ── 1. Start Code Analysis ────────────────────────────────────────────────

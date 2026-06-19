@@ -8,6 +8,7 @@ import { runSecurityAuditAgent } from './agents/securityAuditAgent.js';
 import { runQualityAgent } from './agents/qualityAgent.js';
 import { runLoopholeAgent } from './agents/loopholeAgent.js';
 import { synthesizeReport } from './agents/synthesizer.js';
+import { scanForSecrets } from './secretsScanner.js';
 
 /**
  * Compute strength and fairness scores from agent findings.
@@ -119,6 +120,24 @@ export async function analyzeCode(parsedCode, onProgress) {
     };
 
     const agentOutputs = {};
+
+    // ── Secrets Scanning ─────────────────────────────────────────────────
+    emit('analyze', '🔑 Scanning codebase for hardcoded secrets...');
+    const secretsFindings = scanForSecrets(parsedCode.code, parsedCode.filename);
+    
+    // Filter out generic secret red flags from parser
+    const cleanRedFlags = (parsedCode.redFlags || []).filter(
+        f => !['Hardcoded password', 'Hardcoded secret', 'Hardcoded API key', 'Hardcoded token'].includes(f.name)
+    );
+    
+    // Merge secrets findings into parsedCode's findings
+    parsedCode.redFlags = [...cleanRedFlags, ...secretsFindings];
+    
+    if (secretsFindings.length > 0) {
+        emit('analyze', `⚠️ Secrets scanner identified ${secretsFindings.length} credentials leak(s)`);
+    } else {
+        emit('analyze', '✅ Secrets scan clean (no leaks found)');
+    }
 
     // ── Agent 1: Static Analysis ─────────────────────────────────────────
     emit('analyze', '🔬 Static Analysis Agent scanning code structure...');

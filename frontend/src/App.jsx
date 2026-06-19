@@ -238,6 +238,13 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('report');
   const [isDownloading, setIsDownloading] = useState(false);
 
+  const [inputMode, setInputMode] = useState('editor'); // 'editor' | 'github'
+  const [githubUrl, setGithubUrl] = useState('');
+  const [githubBranch, setGithubBranch] = useState('');
+  const [githubToken, setGithubToken] = useState('');
+  const [isFetchingGithub, setIsFetchingGithub] = useState(false);
+  const [githubError, setGithubError] = useState(null);
+
   const singleFileRef = useRef(null);
   const folderFileRef = useRef(null);
   const multiFileRef = useRef(null);
@@ -353,6 +360,42 @@ export default function App() {
     setPhases(prev => ({ ...prev, [phase]: status }));
   }, []);
 
+  const fetchGithubRepository = useCallback(async (e) => {
+    if (e) e.preventDefault();
+    if (!githubUrl.trim() || isFetchingGithub) return;
+
+    setIsFetchingGithub(true);
+    setGithubError(null);
+
+    try {
+      const response = await fetch(`${API_BASE}/api/github/fetch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          repoUrl: githubUrl,
+          branch: githubBranch,
+          token: githubToken
+        })
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to fetch GitHub repository');
+      }
+
+      const data = await response.json();
+      setCode(data.combinedCode);
+      setFilename(data.repoName);
+      setLoadedFiles(data.files);
+      setInputMode('editor');
+      setLanguage('auto');
+    } catch (err) {
+      setGithubError(err.message);
+    } finally {
+      setIsFetchingGithub(false);
+    }
+  }, [githubUrl, githubBranch, githubToken, isFetchingGithub]);
+
   // ── Smart multi-file handler ──────────────────────────────────────────
   const handleFiles = useCallback((fileList) => {
     // Step 1: Filter — keep only real source code, skip noise
@@ -456,6 +499,11 @@ export default function App() {
     setLoadedFiles([]);
     setCode(SAMPLE_CODE);
     setFilename('example.py');
+    setInputMode('editor');
+    setGithubUrl('');
+    setGithubBranch('');
+    setGithubToken('');
+    setGithubError(null);
   }, []);
 
   // ── Start analysis ─────────────────────────────────────────────────────
@@ -547,9 +595,17 @@ export default function App() {
     setAnalysisId(null);
     setActiveTab('report');
     setLoadedFiles([]);
+    setInputMode('editor');
+    setGithubUrl('');
+    setGithubBranch('');
+    setGithubToken('');
+    setGithubError(null);
   }, []);
 
   const getPhaseStatus = (phaseId) => phases[phaseId] || 'pending';
+
+  const secrets = result && result.findings ? result.findings.filter(f => f.isSecret) : [];
+  const otherFindings = result && result.findings ? result.findings.filter(f => !f.isSecret) : [];
 
   const showHero    = !isAnalyzing && !result && !error;
   const showProgress = isAnalyzing;
@@ -646,6 +702,16 @@ export default function App() {
                 <input ref={folderFileRef} type="file" style={{ display: 'none' }}
                   webkitdirectory="true" multiple
                   onChange={e => handleFiles(e.target.files)} />
+
+                {/* GitHub Repo */}
+                <button
+                  id="upload-github-btn"
+                  className={`btn-upload btn-upload-github ${inputMode === 'github' ? 'active' : ''}`}
+                  onClick={() => setInputMode(prev => prev === 'github' ? 'editor' : 'github')}
+                  disabled={isAnalyzing}
+                >
+                  🐙 GitHub Repo
+                </button>
               </div>
             </div>
 
@@ -665,15 +731,96 @@ export default function App() {
                   🗂️ Drop files or a folder here
                 </div>
               )}
-              <textarea
-                id="code-input"
-                className="code-textarea"
-                value={code}
-                onChange={e => { setCode(e.target.value); setLoadedFiles([]); }}
-                placeholder={"// Paste your code here, or use the buttons above to upload a file, multiple files, or an entire folder.\n// Supported: Python, JS, TS, Java, C++, Go, Rust, PHP, Ruby, C#\n\nfunction example() {\n  const secret = 'hardcoded-api-key'; // ← Rakshak will catch this!\n}"}
-                spellCheck={false}
-                disabled={isAnalyzing}
-              />
+              {inputMode === 'github' ? (
+                <div className="github-form-container animate-fade-in">
+                  <div className="github-form-header">
+                    <span className="github-icon">🐙</span>
+                    <div>
+                      <h3 className="github-title">Scan GitHub Repository</h3>
+                      <p className="github-desc">Enter repository details to fetch and scan code files directly from GitHub.</p>
+                    </div>
+                  </div>
+                  
+                  <form onSubmit={fetchGithubRepository} className="github-form">
+                    <div className="form-group">
+                      <label htmlFor="github-url-input">Repository URL <span className="required">*</span></label>
+                      <input
+                        id="github-url-input"
+                        type="url"
+                        placeholder="https://github.com/owner/repository"
+                        value={githubUrl}
+                        onChange={e => setGithubUrl(e.target.value)}
+                        required
+                        disabled={isFetchingGithub}
+                      />
+                    </div>
+                    
+                    <div className="form-row">
+                      <div className="form-group">
+                        <label htmlFor="github-branch-input">Branch <span className="optional">(optional)</span></label>
+                        <input
+                          id="github-branch-input"
+                          type="text"
+                          placeholder="e.g. main"
+                          value={githubBranch}
+                          onChange={e => setGithubBranch(e.target.value)}
+                          disabled={isFetchingGithub}
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="github-token-input">Personal Access Token <span className="optional">(for private repos)</span></label>
+                        <input
+                          id="github-token-input"
+                          type="password"
+                          placeholder="ghp_..."
+                          value={githubToken}
+                          onChange={e => setGithubToken(e.target.value)}
+                          disabled={isFetchingGithub}
+                        />
+                      </div>
+                    </div>
+
+                    {githubError && (
+                      <div className="github-form-error">
+                        ⚠️ {githubError}
+                      </div>
+                    )}
+
+                    <div className="github-form-actions">
+                      <button
+                        type="button"
+                        className="btn-github-cancel"
+                        onClick={() => setInputMode('editor')}
+                        disabled={isFetchingGithub}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn-github-submit"
+                        disabled={isFetchingGithub || !githubUrl.trim()}
+                      >
+                        {isFetchingGithub ? (
+                          <><div className="spinner"></div>Fetching Repo...</>
+                        ) : (
+                          <>Fetch & Load Files</>
+                        )}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              ) : (
+                <textarea
+                  id="code-input"
+                  className="code-textarea"
+                  value={code}
+                  onChange={e => { setCode(e.target.value); setLoadedFiles([]); }}
+                  placeholder={"// Paste your code here, or use the buttons above to upload a file, multiple files, or an entire folder.\n// Supported: Python, JS, TS, Java, C++, Go, Rust, PHP, Ruby, C#\n\nfunction example() {\n  const secret = 'hardcoded-api-key'; // ← Rakshak will catch this!\n}"}
+                  spellCheck={false}
+                  disabled={isAnalyzing}
+                />
+              )}
             </div>
 
             <div className="editor-footer">
@@ -819,13 +966,14 @@ export default function App() {
             <div className="report-tabs">
               {[
                 { id: 'report',   label: '📋 Full Report' },
-                { id: 'findings', label: '🔍 Issues Found' },
+                { id: 'secrets',  label: `🔑 Secrets Leaks (${secrets.length})` },
+                { id: 'findings', label: `🔍 Code Vulnerabilities (${otherFindings.length})` },
                 { id: 'metrics',  label: '📊 Code Stats' },
               ].map(tab => (
                 <button
                   key={tab.id}
                   id={`tab-${tab.id}`}
-                  className={`report-tab ${activeTab === tab.id ? 'active' : ''}`}
+                  className={`report-tab ${activeTab === tab.id ? 'active' : ''} ${tab.id === 'secrets' && secrets.length > 0 ? 'highlight-secrets' : ''}`}
                   onClick={() => setActiveTab(tab.id)}
                 >
                   {tab.label}
@@ -839,10 +987,42 @@ export default function App() {
               </div>
             )}
 
+            {activeTab === 'secrets' && (
+              <div className="secrets-list">
+                {secrets.length > 0 ? (
+                  secrets.map((secret, i) => (
+                    <div key={i} className="secret-item critical animate-slide-in" style={{ animationDelay: `${i * 0.05}s` }}>
+                      <div className="secret-item-header">
+                        <span className="secret-badge">🔒 {secret.name}</span>
+                        <span className="secret-location">
+                          📁 <span>{secret.file}</span>:L<strong>{secret.line}</strong>
+                        </span>
+                      </div>
+                      <div className="secret-snippet-wrap">
+                        <div className="secret-snippet-label">Leaked line content:</div>
+                        <pre className="secret-snippet">
+                          <code>{secret.sample}</code>
+                        </pre>
+                      </div>
+                      <div className="secret-remediation">
+                        💡 <strong>Remediation:</strong> {secret.remediation}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
+                    <div style={{ fontSize: 48, marginBottom: 16 }}>🛡️</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--low)', marginBottom: 8 }}>No Secrets Leaks Detected</div>
+                    <div style={{ fontSize: 13 }}>GitGuardian scanner analyzed the codebase and found no hardcoded API keys or credentials.</div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {activeTab === 'findings' && (
               <div className="findings-list">
-                {result.findings && result.findings.length > 0 ? (
-                  result.findings.map((finding, i) => (
+                {otherFindings.length > 0 ? (
+                  otherFindings.map((finding, i) => (
                     <div key={i} className={`finding-item ${finding.severity}`} style={{ animationDelay: `${i * 0.05}s` }}>
                       <span className="finding-badge">{finding.severity}</span>
                       <div className="finding-content">
@@ -854,7 +1034,7 @@ export default function App() {
                 ) : (
                   <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>
                     <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--low)', marginBottom: 8 }}>No Obvious Issues Found</div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: 'var(--low)', marginBottom: 8 }}>No Code Vulnerabilities Found</div>
                     <div style={{ fontSize: 13 }}>Check the Full Report tab for the complete AI analysis.</div>
                   </div>
                 )}
